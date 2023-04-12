@@ -66,7 +66,6 @@ def plot_rest_categories(db):
         if str(row[0]) not in dict:
             dict[str(row[0])] = int(row[1])
     
-    print(dict)
     x = list(dict.values())
     y = list(dict.keys())
     plt.barh(y, x)
