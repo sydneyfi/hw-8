@@ -1,6 +1,6 @@
-# Your name: 
-# Your student id:
-# Your email:
+# Your name: Sydney Finkelstein
+# Your student id: 31660029
+# Your email: sydneyfi@umich.edu
 # List who you have worked with on this homework:
 
 import matplotlib.pyplot as plt
@@ -15,6 +15,31 @@ def load_rest_data(db):
     and each inner key is a dictionary, where the key:value pairs should be the category, 
     building, and rating for the restaurant.
     """
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT restaurants.name, categories.category, buildings.building, restaurants.rating
+        FROM restaurants
+        JOIN categories ON restaurants.category_id = categories.id
+        JOIN buildings ON restaurants.building_id = buildings.id
+    """)
+    data = cur.fetchall()
+
+    dict = {}
+    for row in data:
+        name = row[0]
+        category = row[1]
+        building = row[2]
+        rating = row[3]
+        if name not in dict:
+            dict[name] = {}
+        dict[name]["category"] = category
+        dict[name]["building"] = building
+        dict[name]["rating"] = rating
+    
+    conn.close()
+    return dict
     pass
 
 def plot_rest_categories(db):
@@ -23,6 +48,35 @@ def plot_rest_categories(db):
     restaurant categories and the values should be the number of restaurants in each category. The function should
     also create a bar chart with restaurant categories and the count of number of restaurants in each category.
     """
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT categories.category, COUNT(restaurants.id)
+        FROM restaurants
+        JOIN categories ON restaurants.category_id = categories.id
+        GROUP BY categories.category
+        ORDER BY COUNT(restaurants.id) DESC
+        """)
+    
+    data = cur.fetchall()
+    
+    dict = {}
+    for row in data:
+        if str(row[0]) not in dict:
+            dict[str(row[0])] = int(row[1])
+    
+    print(dict)
+    x = list(dict.values())
+    y = list(dict.keys())
+    plt.barh(y, x)
+    plt.xlabel('Number of Restaurants')
+    plt.ylabel('Restaurant Categories')
+    plt.title('Types of Resturants on South University Ave')
+    plt.show()
+
+    conn.close()
+    return dict
     pass
 
 def find_rest_in_building(building_num, db):
@@ -31,6 +85,24 @@ def find_rest_in_building(building_num, db):
     restaurant names. You need to find all the restaurant names which are in the specific building. The restaurants 
     should be sorted by their rating from highest to lowest.
     '''
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT restaurants.name
+        FROM restaurants JOIN buildings ON restaurants.building_id = buildings.id
+        WHERE buildings.building = ?
+        ORDER BY restaurants.rating DESC
+        """, (building_num,))
+    
+    data = cur.fetchall()
+    
+    conn.close()
+    
+    lst = []
+    for row in data:
+        lst.append(row[0])
+    return lst
     pass
 
 #EXTRA CREDIT
