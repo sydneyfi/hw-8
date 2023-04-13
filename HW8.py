@@ -34,9 +34,9 @@ def load_rest_data(db):
         rating = row[3]
         if name not in dict:
             dict[name] = {}
-        dict[name]["category"] = category
         dict[name]["building"] = building
         dict[name]["rating"] = rating
+        dict[name]["category"] = category
     
     conn.close()
     return dict
